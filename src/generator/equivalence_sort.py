@@ -1,6 +1,5 @@
 "must implement later for case max < min"
 
-import abc
 
 
 def generate_classes(parameter):
@@ -20,59 +19,85 @@ def generate_integer_classes(parameter):
                 {"value": 1.5,"valid": False,"class":"float"},
                 {"value": True,"valid": False,"class":"boolean"}]
     if parameter.get("type") =="integer":
-        if "minimum" in parameter:
-            response.append({"value": parameter.get("minimum"),"valid": True,"class":"minimum"})
-            response.append({"value": parameter.get("minimum") - 1,"valid": False,"class":"below_minimum"})
-
-        if "maximum" in parameter:
-          response.append({"value": parameter.get("maximum"),"valid": True,"class":"maximum"})
-          response.append({"value": parameter.get("maximum") + 1,"valid": False,"class":"above_maximum"})
-
-        if "minimum" in parameter or "maximum" in parameter:
-             if (
-        ("minimum" not in parameter or parameter["minimum"] <= 5)
-        and
-        ("maximum" not in parameter or parameter["maximum"] >= 5)
-    ):
-                 response.append({"value": 5,"valid": True,"class":"between_minimum_maximum"})
-        else :
-                 response.append({"value": 5,"valid": False,"class":"between_minimum_maximum"})
+        if "minimum" in parameter and "maximum" in parameter:
+                x = (parameter.get("minimum") + parameter.get("maximum")) // 2
+                y = parameter.get("minimum") -1
+                z = parameter.get("maximum") + 1
+                response.append({"value": x,"valid": True,"class":"valid_representative"})
+                response.append({"value": y,"valid": False,"class":"invalid_representative"})
+                response.append({"value": z,"valid": False,"class":"invalid_representative"})
+                #only min
+        elif "minimum" in parameter and "maximum" not in parameter:
+                    x = parameter.get("minimum") + 1
+                    y = parameter.get("minimum") - 1
+                    response.append({"value": x,"valid": True,"class":"valid_representative"})
+                    response.append({"value": y,"valid": False,"class":"invalid_representative"})
+                    #only max
+        elif "minimum" not in parameter and "maximum" in parameter:
+                    x = parameter.get("maximum") - 1
+                    z = parameter.get("maximum") + 1
+                    response.append({"value": x,"valid": True,"class":"valid_representative"})
+                    response.append({"value": z,"valid": False,"class":"invalid_representative"})
+        else:
+                    response.append({"value": 5,"valid": True,"class":"valid_representative"})
         return response
-
-    
+    return []
 
 def generate_string_classes(parameter):
     response = [{"value": 123,"valid": False,"class":"integer"},
                 {"value": 1.5,"valid": False,"class":"float"},
-                {"value": True,"valid": False,"class":"boolean"},
-                {"value": "abc","valid": True,"class":"string"}]
+                {"value": True,"valid": False,"class":"boolean"}]
     if parameter.get("type") == "string":
-        if "minLength" in parameter:
-            response.append({"value": "a" * parameter.get("minLength"),"valid": True,"class":"minLength"})
-            response.append({"value": "a" * (parameter.get("minLength") - 1),"valid": False,"class":"below_minLength"})
-        if "maxLength" in parameter:
-            response.append({"value": "a" * parameter.get("maxLength"),"valid": True,"class":"maxLength"})
-            response.append({"value": "a" * (parameter.get("maxLength") + 1),"valid": False,"class":"above_maxLength"})
-        if "minLength" in parameter or "maxLength" in parameter:
-                if (
-                ("minLength" not in parameter or parameter["minLength"] <= 5)
-                and
-                ("maxLength" not in parameter or parameter["maxLength"] >= 5)
-            ):
-                 response.append({"value": "abcde","valid": True,"class":"between_minlength_maxlength"})
-        else :
-                 response.append({"value": "abcde","valid": False,"class":"between_minlength_maxlength"})
+        if "minLength" in parameter and "maxLength" in parameter:
+                   if parameter.get("maxLength") == 0 and parameter.get("minLength") == 0:
+                       response.append({"value": "","valid": True,"class":"valid_representative"})
+                       response.append({"value": "a","valid": False,"class":"invalid_representative"})
+                   elif parameter.get("minLength") == 0 and parameter.get("maxLength") > 0:
+                       x = "a" * (parameter.get("maxLength") // 2)
+                       response.append({"value": x,"valid": True,"class":"valid_representative"})
+                       response.append({"value": "","valid": True,"class":"valid_representative"})
+                       response.append({"value": "a" * (parameter.get("maxLength") + 1),"valid": False,"class":"invalid_representative"})
+                   elif parameter.get("minLength") <= parameter.get("maxLength"):
+                       x = "a" * ((parameter.get("minLength") + parameter.get("maxLength")) // 2)
+                       y = "a" * (parameter.get("minLength") - 1)
+                       z = "a" * (parameter.get("maxLength") + 1)
+                       response.append({"value": x,"valid": True,"class":"valid_representative"})
+                       response.append({"value": y,"valid": False,"class":"invalid_representative"})
+                       response.append({"value": z,"valid": False,"class":"invalid_representative"})
+                       #only min
+        elif "minLength" in parameter and "maxLength" not in parameter:
+                           if parameter.get("minLength") == 0:
+                               response.append({"value": "","valid": True,"class":"valid_representative"})
+                               response.append({"value": "a","valid": True,"class":"valid_representative"})
+                           else:
+                               x = "a" * (parameter.get("minLength") + 1)
+                               y = "a" * (parameter.get("minLength") - 1)
+                               response.append({"value": y,"valid": False,"class":"invalid_representative"})
+                               response.append({"value": x,"valid": True,"class":"valid_representative"})
+                           #only max
+        elif "minLength" not in parameter and "maxLength" in parameter:
+                           if parameter.get("maxLength") == 0:
+                               response.append({"value": "","valid": True,"class":"valid_representative"})
+                               response.append({"value": "a","valid": False,"class":"invalid_representative"})
+                           else:      
+                             z = "a" * (parameter.get("maxLength") + 1)
+                             x = "a" *(parameter.get("maxLength") - 1)
+                             response.append({"value": x,"valid": True,"class":"valid_representative"})
+                             response.append({"value": z,"valid": False,"class":"invalid_representative"})
+        else:
+                           response.append({"value": "abcdef","valid": True,"class":"valid_representative"})
         return response
-
+    return []
 def generate_boolean_classes(parameter):
     if parameter.get("type") == "boolean":
-     response = [{"value": 123,"valid": False,"class":"integer"},
+         response = [{"value": 123,"valid": False,"class":"integer"},
                 {"value": 1.5,"valid": False,"class":"float"},
                 {"value": "abc","valid": False,"class":"string"},
                 {"value": True,"valid": True,"class":"true"},
                 {"value": False,"valid": True,"class":"false"},
                 {"value": "True","valid": False,"class":"true"},
                 {"value": "False","valid": False,"class":"false"}]
-    return response
+         return response
+    return []
 
 
